@@ -1,5 +1,5 @@
 ---
-title: SHA:MAN
+title: SHA:MANISM
 emoji: ☯️
 colorFrom: purple
 colorTo: red

@@ -16,4 +16,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://young-52:$HF_TOKEN@huggingface.co/spaces/young-52/snu-shaman main
+        run: git push --force https://young-52:$HF_TOKEN@huggingface.co/spaces/young-52/snu-shamanism main
