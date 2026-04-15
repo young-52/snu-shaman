@@ -24,7 +24,7 @@ if os.path.exists(_env_path):
 
 
 # ═══════════════════════════════════════════════════════
-#  Custom CSS — 신비로운 무속 테마
+#  Custom CSS — 사주 추천 테마
 # ═══════════════════════════════════════════════════════
 CUSTOM_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap');
@@ -242,7 +242,7 @@ def on_chat(message, history, user_saju_state, hf_token: gr.OAuthToken | None = 
             {"role": "user", "content": message},
             {
                 "role": "assistant",
-                "content": "🔮 먼저 사이드바에서 생년월일시를 입력하고 **[사주 분석하기]** 버튼을 눌러주세요!\n\n관악의 기운을 읽으려면 그대의 사주를 알아야 하느니라...",
+                "content": "🔮 먼저 사이드바에서 생년월일시를 입력하고 **[사주 분석하기]** 버튼을 눌러주세요!",
             },
         ]
         return
@@ -259,7 +259,7 @@ def on_chat(message, history, user_saju_state, hf_token: gr.OAuthToken | None = 
             {"role": "user", "content": message},
             {
                 "role": "assistant",
-                "content": "🔑 Hugging Face 토큰이 필요하도다!\n\n사이드바에서 로그인하거나, `.env` 파일에 `HF_TOKEN`을 설정해 주세요.",
+                "content": "🔑 Hugging Face 토큰이 필요합니다.\n\n사이드바에서 로그인하거나, `.env` 파일에 `HF_TOKEN`을 설정해 주세요.",
             },
         ]
         return
@@ -356,19 +356,16 @@ with gr.Blocks(title="샤:머니즘 — 관악의 기운을 읽다") as demo:
         gr.Markdown("---")
 
         saju_result_display = gr.Markdown(
-            value=(
-                "> *생년월일시를 입력하고 분석 버튼을 누르면,*\n"
-                "> *관악산의 기운이 그대의 사주를 읽으리라...* 🌙"
-            ),
+            value=("> *생년월일시를 입력하고 분석 버튼을 눌러주세요.* 🌙"),
             elem_id="saju-result",
         )
 
     # ── 메인 영역: 챗봇 ──
     chatbot = gr.Chatbot(
         value=[],
-        label="🔮 관악 신당",
+        label="🔮 샤:머니즘",
         placeholder=(
-            "🌙 관악산의 영험한 기운이 감도는 이곳에 오신 것을 환영하노라.\n\n"
+            "✨ 사주 기반 캠퍼스 추천 서비스에 오신 것을 환영합니다.\n\n"
             "← 왼쪽 사이드바에서 생년월일시를 입력하고\n"
             "**[🔮 사주 분석하기]** 버튼을 눌러 시작하세요."
         ),
@@ -381,7 +378,7 @@ with gr.Blocks(title="샤:머니즘 — 관악의 기운을 읽다") as demo:
     )
 
     msg_input = gr.Textbox(
-        placeholder="관악의 무당에게 물어보세요... (예: 오늘 공부하기 좋은 곳은?)",
+        placeholder="무엇이든 물어보세요! (예: 오늘 공부하기 좋은 곳은?)",
         show_label=False,
         container=False,
         elem_id="msg-input",

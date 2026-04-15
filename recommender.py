@@ -1,7 +1,7 @@
 """
 🔮 The Persona: LLM Reasoning & RAG Lead
 RAG 기반 추천 시스템 — JSON 데이터에서 부족한 오행에 맞는 장소/음료를 필터링하고
-무당 페르소나 프롬프트를 구성하여 응답을 생성한다.
+시스템 프롬프트를 구성하여 응답을 생성한다.
 """
 
 import json
@@ -119,7 +119,7 @@ def filter_cafes(element: str, max_results: int = 3) -> list[dict]:
 
 def build_system_prompt(saju_result: dict) -> str:
     """
-    무당 페르소나의 시스템 프롬프트를 생성한다.
+    시스템 프롬프트를 생성한다.
     사주 분석 결과와 추천 데이터를 포함한다.
     """
     weakest = saju_result["weakest"]
@@ -153,12 +153,14 @@ def build_system_prompt(saju_result: dict) -> str:
             f"     사유: {cafe.get('reason', '')}\n"
         )
 
-    system_prompt = f"""너는 '관악산 신당'의 영험한 무당이자, 서울대학교 캠퍼스의 풍수지리를 꿰뚫고 있는 해박한 존재이다.
-서울대 학생들의 사주를 읽어 오늘의 행운 장소와 음료를 추천해주는 것이 너의 사명이다.
+    system_prompt = f"""너는 서울대학교 캠퍼스의 장소와 카페에 대해 잘 알고 있는 사주 기반 추천 서비스 '샤:머니즘'의 AI 어시스턴트입니다.
+사용자의 사주 오행을 분석하여, 부족한 기운을 보충할 수 있는 캠퍼스 내 장소와 음료를 추천하는 것이 당신의 역할입니다.
 
 ## 말투 규칙 (필수)
-- 반드시 무당 말투를 사용하라: ~로구나, ~하도다, ~이로다, ~할 것이니, ~하리라, ~이니라, ~바라느니라
-- 답변은 한국어로만 하라
+- 현대적이고 일상적인 높임체를 사용하세요: ~합니다, ~드립니다, ~입니다, ~하세요, ~좋겠습니다
+- 무당 말투(~로구나, ~하도다, ~이로다 등)는 절대 사용하지 마세요
+- 친근하면서도 신뢰감 있는 톤을 유지하세요
+- 답변은 한국어로만 하세요
 
 ## 사주 분석 정보
 - 간지: {saju_result["gap_ja_str"]}
@@ -166,21 +168,21 @@ def build_system_prompt(saju_result: dict) -> str:
 - 가장 강한 기운: {saju_result["strongest_name"]} ({saju_result["strongest"]})
 - 오행 분포: {saju_result["element_count"]}
 
-## 오늘의 추천 장소 (부족한 {weakest_name} 기운을 보하는 곳)
+## 오늘의 추천 장소 (부족한 {weakest_name} 기운을 보충하는 곳)
 {loc_info}
 
 ## 오늘의 추천 음료 (부족한 {weakest_name} 기운을 채우는 한 잔)
 {cafe_info}
 
 ## 대화 지침
-1. 첫 대화에서는 사주 분석 결과를 영험하게 풀이하고, 추천 장소 1곳과 음료 1잔을 자연스럽게 언급하라.
-2. 후속 대화에서는 사용자 질문에 따라 추가 장소/음료를 추천하거나, 오행에 기반한 조언을 하라.
-3. 추천할 때 오행 상생상극 원리를 활용하라:
+1. 첫 대화에서는 사주 분석 결과를 간결하게 설명하고, 추천 장소 1곳과 음료 1잔을 자연스럽게 안내하세요.
+2. 후속 대화에서는 사용자 질문에 따라 추가 장소/음료를 추천하거나, 오행에 기반한 조언을 해주세요.
+3. 추천할 때 오행 상생상극 원리를 활용하세요:
    - 상생: 木→火→土→金→水→木 (목생화, 화생토, 토생금, 금생수, 수생목)
    - 상극: 木→土→水→火→金→木 (목극토, 토극수, 수극화, 화극금, 금극목)
-4. 장소를 추천할 때는 건물번호와 단과대학 이름을 언급하라.
-5. 음료를 추천할 때는 카페명, 메뉴명, 가격을 언급하라.
-6. 답변은 200자 내외로 간결하지만 영험하게 작성하라.
+4. 장소를 추천할 때는 건물번호와 단과대학 이름을 언급하세요.
+5. 음료를 추천할 때는 카페명, 메뉴명, 가격을 언급하세요.
+6. 답변은 200자 내외로 간결하고 명확하게 작성하세요.
 """
     return system_prompt
 
@@ -215,13 +217,13 @@ def create_initial_greeting(saju_result: dict) -> str:
         cafe_text = f"**{c['cafe']}**의 **{c['menu']}** ({price})"
 
     greeting = (
-        f"허허, 관악의 기운이 흔들리는구나! 🌀\n\n"
-        f"그대의 사주를 살피니, **{weakest_name}** {ELEMENT_EMOJI[weakest]}의 기운이 "
-        f"심히 부족하도다.\n\n"
-        f"오늘은 {loc_text}에 가면 부족한 기운을 채울 수 있으리라.\n\n"
-        f"음료는 {cafe_text}을 들이키면, "
-        f"자하연의 샘물처럼 {weakest_name}의 기운이 솟아날 것이니라! 🔮\n\n"
-        f"*더 궁금한 것이 있으면 물어보거라, 관악산의 기운이 그대를 인도할 것이니...*"
+        f"사주 분석이 완료되었습니다! ✨\n\n"
+        f"오늘의 오행을 보니, **{weakest_name}** {ELEMENT_EMOJI[weakest]}의 기운이 "
+        f"가장 부족합니다.\n\n"
+        f"오늘은 {loc_text}에 가시면 부족한 기운을 보충하실 수 있습니다.\n\n"
+        f"음료는 {cafe_text}을 추천드립니다. "
+        f"{weakest_name}의 기운을 채우기에 딱 좋은 선택이에요! ☕\n\n"
+        f"*더 궁금한 점이 있으시면 편하게 물어보세요.*"
     )
     return greeting
 
@@ -281,9 +283,9 @@ def get_llm_response(
         error_msg = str(e)
         if "API key" in error_msg or "token" in error_msg.lower() or "401" in error_msg:
             yield (
-                "🔑 허허, HuggingFace 토큰이 유효하지 않구나!\n\n"
-                "`.env` 파일의 `HF_TOKEN`을 확인하거나, "
-                "사이드바에서 HuggingFace 로그인을 다시 시도해 보거라."
+                "🔑 HuggingFace 토큰이 유효하지 않은 것 같습니다.\n\n"
+                "`.env` 파일의 `HF_TOKEN`을 확인하시거나, "
+                "사이드바에서 HuggingFace 로그인을 다시 시도해 주세요."
             )
         else:
-            yield f"⚠️ 관악산의 기운이 잠시 흐트러졌도다...\n\n오류: {error_msg}"
+            yield f"⚠️ 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.\n\n오류: {error_msg}"
