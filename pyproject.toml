@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "gradio[oauth]>=6.12.0",
+    "korean-lunar-calendar>=0.3.1",
 ]
 
 [dependency-groups]
